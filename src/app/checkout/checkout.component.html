@@ -1,0 +1,76 @@
+<div class="checkout-container">
+  <h1>Stripe Payment Checkout</h1>
+  
+  <!-- Product Information -->
+  <div class="product-info" *ngIf="loadingProduct">
+    <p>Loading product details...</p>
+  </div>
+  
+  <div class="product-info" *ngIf="!loadingProduct && productDetails">
+    <h2>{{ productDetails.name }}</h2>
+    <p *ngIf="productDetails.description" class="product-description">{{ productDetails.description }}</p>
+    <div class="product-images" *ngIf="productDetails.images && productDetails.images.length > 0">
+      <img *ngFor="let image of productDetails.images" [src]="image" [alt]="productDetails.name" />
+    </div>
+    <div class="product-price" *ngIf="priceDetails">
+      <strong>Price: {{ (priceDetails.unit_amount / 100).toFixed(2) }} {{ priceDetails.currency.toUpperCase() }}</strong>
+    </div>
+  </div>
+  
+  <div class="payment-form-wrapper">
+    <form id="payment-form" (ngSubmit)="handleSubmit($event)">
+      <div class="form-group">
+        <label>Product ID</label>
+        <input 
+          type="text" 
+          [value]="productId"
+          disabled
+          class="product-id-input"
+        />
+      </div>
+      
+      <div class="form-group">
+        <label>Amount</label>
+        <div class="amount-display">
+          <strong>${{ (amount / 100).toFixed(2) }}</strong>
+          <small *ngIf="!productDetails">(Default amount - configure backend to load from product)</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="card-element">Card Information</label>
+        <div id="card-element" #cardElement>
+          <!-- Stripe Elements will create form elements here -->
+        </div>
+        <div id="card-errors" role="alert" *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+      </div>
+
+      <div class="success-message" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+
+      <button 
+        type="submit" 
+        id="submit-button"
+        [disabled]="loading || !amount || amount <= 0"
+        class="submit-button"
+      >
+        <span *ngIf="!loading">Pay ${{ (amount / 100).toFixed(2) }}</span>
+        <span *ngIf="loading">Processing...</span>
+      </button>
+    </form>
+  </div>
+
+  <div class="info-box">
+    <h3>📝 Integration Notes</h3>
+    <p>This is a demo checkout form. To complete the integration:</p>
+    <ol>
+      <li>Add your Stripe publishable key in <code>environment.ts</code></li>
+      <li>Create a backend API endpoint to handle payment intents</li>
+      <li>Update the <code>createPaymentIntent</code> method in checkout.component.ts</li>
+      <li>Test with Stripe test cards: <code>4242 4242 4242 4242</code></li>
+    </ol>
+  </div>
+</div>
